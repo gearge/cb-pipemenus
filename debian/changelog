@@ -1,0 +1,26 @@
+cb-pipemenus (0.04) unstable; urgency=low
+
+  * Add cb-sshconfig-pipemenu
+  * Add python & python-paramiko to depends
+
+ -- Philip Newborough <corenominal@corenominal.org>  Fri, 27 Apr 2012 08:34:48 +0100
+
+cb-pipemenus (0.03) unstable; urgency=low
+
+  * cb-x-www-browser-pipemenu:
+    - add installation routine for Iceweasel
+    - add installation routine for Chromium Browser
+
+ -- Philip Newborough <corenominal@corenominal.org>  Wed, 25 Apr 2012 09:09:38 +0100
+
+cb-pipemenus (0.02) unstable; urgency=low
+
+  * cb-dropbox-pipemenu: get binary files from official site.
+
+ -- Philip Newborough <corenominal@corenominal.org>  Fri, 20 Apr 2012 11:02:16 +0100
+
+cb-pipemenus (0.01) unstable; urgency=low
+
+  * Initial release.
+
+ -- Philip Newborough <corenominal@corenominal.org>  Mon, 16 Apr 2012 11:28:48 +0100

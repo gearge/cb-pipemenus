@@ -1,0 +1,121 @@
+#!/bin/bash
+# ---------------------------------------------------------------------
+# An Openbox pipemenu for configuring printing under CrunchBang Linux.
+# Written for CrunchBang Linux <http://crunchbanglinux.org/>
+# by Philip Newborough (aka corenominal) <mail@philipnewborough.co.uk>
+# ---------------------------------------------------------------------
+
+# Set flag
+INSTALLED=false
+
+if [ "$1" = "--install" ]; then
+    terminator --title="Install Printer Support" --command="cb-printing-pipemenu --install-printing"
+    exit 0
+fi
+if [ "$1" = "--install-printing" ]; then
+    clear
+    echo ""
+    echo "  INSTALL PRINTING SUPPORT"
+    echo "  ------------------------"
+    echo "  This script will install printing support."
+    echo ""
+    echo -n "  Run the installer now? (Y|n) > "
+    read a
+    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
+    [ "$a" = "" ]; then
+        # Checking internet connection...
+        clear
+        echo "  Checking internet connection..."
+        sleep 2s
+        echo ""
+        IS=`/bin/ping -c 1 ftp.debian.org | grep -c "64 bytes"`
+        if [ "$IS" -lt "1" ]; then
+            until [ "$CONT" != "" ]; do
+                echo ""
+                IS=`/bin/ping -c 1 ftp.debian.org | grep -c "64 bytes"`
+                if [ "$IS" -lt "1" ]; then
+                    clear
+                    echo "  Failed to connect with package repository!"
+                    echo ""
+                    echo "  This script requires a working internet connection. Please configure"
+                    echo "  your internet connection, then hit any key to continue, else hit \"q\""
+                    echo "  to quit."
+                    read -n1 a
+                    if [ "$a" = "q" ]; then
+                        clear
+                        echo "Script aborted."
+                        sleep 3s
+                        exit 0
+                    fi
+                else
+                    CONT="pass"
+                fi
+            done
+        fi
+        clear
+        echo "  Internet connection test passed..."
+        sleep 2s
+        clear
+        echo "  Updating sources..."
+        sleep 2s
+        sudo apt-get update
+        clear
+        if ! sudo apt-get install -y cups cups-pdf system-config-printer printer-driver-hpijs; then
+            clear
+            echo ""
+            echo "  There was a problem installing printing packages."
+            echo ""
+            echo "  Hit any key to try again, or \"q\" to quit..."
+            read -n1 a
+            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+                clear
+                exit 0
+            else
+                cb-printing-pipemenu --install-printing
+                exit 0
+            fi
+        else
+            clear
+            echo ""
+            echo "  Printing support has been installed successfully."
+            echo ""
+            echo "  Hit any key to exit..."
+            read -n1 a
+            exit 0
+        fi
+    else
+        exit 0
+    fi
+fi
+# Start pipemenu
+echo "    <openbox_pipe_menu>"
+
+# check for system-config-printer
+if [ -x "/usr/bin/system-config-printer" ];then
+    INSTALLED=true
+    cat << _scf_
+	    <item label="Configure Printers">
+            <action name="Execute">
+				<execute>
+					gksudo system-config-printer
+				</execute>
+			</action>
+		</item>
+_scf_
+fi
+
+if [ $INSTALLED = false ]; then
+    cat << _install_
+	    <item label="Install Printing Support">
+            <action name="Execute">
+				<execute>
+					cb-printing-pipemenu --install
+				</execute>
+			</action>
+		</item>
+_install_
+fi
+
+# End pipemenu
+echo "    </openbox_pipe_menu>"
+exit 0

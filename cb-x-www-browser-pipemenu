@@ -1,0 +1,414 @@
+#!/bin/bash
+# ---------------------------------------------------------------------
+# Written for CrunchBang Linux <http://crunchbang.org/>
+# by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
+# ---------------------------------------------------------------------
+
+REPO='dl.google.com'
+I=0
+function connectiontest () {
+	clear
+	echo "  Checking internet connection..."
+	sleep 2s
+	echo ""
+	IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
+	if [ "$IS" -lt "1" ]; then
+		until [ "$CONT" != "" ]; do
+			echo ""
+			IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
+			if [ "$IS" -lt "1" ]; then
+				clear
+				echo "  Internet connection test failed!"
+				echo ""
+				echo "  This script requires a working internet connection. Please configure"
+				echo "  your internet connection, then hit any key to continue, else hit \"q\""
+				echo "  to quit."
+				read -n1 a
+				if [ "$a" = "q" ]; then
+					clear
+					echo "Script aborted."
+					sleep 3s
+					exit 0
+				fi
+			else
+				CONT="pass"
+			fi
+		done
+	fi
+	clear
+	echo "  Internet connection test passed..."
+	sleep 2s
+}
+if [ "$1" = "--chromium-browser" ]; then
+    terminator --title="Install Chromium Browser" --command="cb-x-www-browser-pipemenu --install-chromium-browser"
+    exit 0
+fi
+
+if [ "$1" = "--iceweasel" ]; then
+    terminator --title="Install Iceweasel Browser" --command="cb-x-www-browser-pipemenu --install-iceweasel"
+    exit 0
+fi
+
+if [ "$1" = "--google-chrome" ]; then
+    terminator --title="Install Google Chrome" --command="cb-x-www-browser-pipemenu --install-google-chrome"
+    exit 0
+fi
+
+if [ "$1" = "--opera" ]; then
+    terminator --title="Install Opera Browser" --command="cb-x-www-browser-pipemenu --install-opera"
+    exit 0
+fi
+
+if [ "$1" = "--install-chromium-browser" ]; then
+    clear
+    echo ""
+    echo "  INSTALL CHROMIUM BROWSER"
+    echo "  ------------------------"
+    echo "  This script will install Chromium."
+    echo ""
+    echo -n "  Run the installer now? (Y|n) > "
+    read a
+    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
+    [ "$a" = "" ]; then
+        
+        connectiontest
+        clear
+        echo "  Updating sources..."
+		sleep 2s
+		sudo apt-get update
+		clear
+        
+        
+        if ! sudo apt-get install -y chromium-browser; then
+            clear
+            echo ""
+            echo "  There was a problem installing Chromium."
+            echo ""
+            echo "  Hit any key to try again, or \"q\" to quit..."
+            read -n1 a
+            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+                clear
+                exit 0
+            else
+                cb-x-www-browser-pipemenu --install-chromium-browser
+                exit 0
+            fi
+        else
+            clear
+            echo ""
+            echo "  Chromium has been installed successfully."
+            echo ""
+            echo "  Hit any key to exit..."
+            read -n1 a
+            exit 0
+        fi
+    else
+        exit 0
+    fi
+fi
+
+if [ "$1" = "--install-iceweasel" ]; then
+    clear
+    echo ""
+    echo "  INSTALL ICEWEASEL BROWSER"
+    echo "  -------------------------"
+    echo "  This script will install Iceweasel."
+    echo ""
+    echo -n "  Run the installer now? (Y|n) > "
+    read a
+    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
+    [ "$a" = "" ]; then
+        
+        connectiontest
+        clear
+        echo "  Updating sources..."
+		sleep 2s
+		sudo apt-get update
+		clear
+        
+        
+        if ! sudo apt-get install -y iceweasel; then
+            clear
+            echo ""
+            echo "  There was a problem installing Iceweasel."
+            echo ""
+            echo "  Hit any key to try again, or \"q\" to quit..."
+            read -n1 a
+            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+                clear
+                exit 0
+            else
+                cb-x-www-browser-pipemenu --install-iceweasel
+                exit 0
+            fi
+        else
+            clear
+            echo ""
+            echo "  Iceweasel has been installed successfully."
+            echo ""
+            echo "  Hit any key to exit..."
+            read -n1 a
+            exit 0
+        fi
+    else
+        exit 0
+    fi
+fi
+
+if [ "$1" = "--install-google-chrome" ]; then
+    clear
+    echo ""
+    echo "  INSTALL GOOGLE CHROME WWW BROWSER"
+    echo "  ---------------------------------"
+    echo "  This script will install Google Chrome."
+    echo ""
+    echo -n "  Run the installer now? (Y|n) > "
+    read a
+    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
+    [ "$a" = "" ]; then
+        
+        connectiontest
+        
+        #add apt-key
+        clear
+        echo "  Adding APT key..."
+        sleep 2s
+        wget http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key
+        sudo apt-key add google-chrome.key
+        rm -f google-chrome.key
+        
+        #create sources file
+        echo "  Creating APT sources file..."
+        sleep 2s
+        if [ -f "/etc/apt/sources.list.d/google-chrome.list" ]; then
+            sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+        fi
+        echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
+        
+        #update sources
+        echo "  Updating sources..."
+		sleep 2s
+		sudo apt-get update
+		clear
+        
+        
+        if ! sudo apt-get install -y google-chrome-stable; then
+            clear
+            echo ""
+            echo "  There was a problem installing Google Chrome."
+            echo ""
+            echo "  Hit any key to try again, or \"q\" to quit..."
+            read -n1 a
+            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+                clear
+                exit 0
+            else
+                cb-x-www-browser-pipemenu --install-google-chrome
+                exit 0
+            fi
+        else
+            clear
+            echo ""
+            echo "  Google Chrome has been installed successfully."
+            echo ""
+            echo "  Hit any key to exit..."
+            read -n1 a
+            exit 0
+        fi
+    else
+        exit 0
+    fi
+fi
+
+if [ "$1" = "--install-opera" ]; then
+    clear
+    echo ""
+    echo "  INSTALL OPERA WWW BROWSER"
+    echo "  -------------------------"
+    echo "  This script will install Opera."
+    echo ""
+    echo -n "  Run the installer now? (Y|n) > "
+    read a
+    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
+    [ "$a" = "" ]; then
+        
+        connectiontest
+        
+        #add apt-key
+        clear
+        echo "  Adding APT key..."
+        sleep 2s
+        wget http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key
+        sudo apt-key add opera.key
+        rm -f opera.key
+        
+        #create sources file
+        echo "  Creating APT sources file..."
+        sleep 2s
+        if [ -f "/etc/apt/sources.list.d/opera.list" ]; then
+            sudo rm -f /etc/apt/sources.list.d/opera.list
+        fi
+        echo "deb http://deb.opera.com/opera/ stable non-free" | sudo tee -a /etc/apt/sources.list.d/opera.list
+        #update sources
+        echo "  Updating sources..."
+		sleep 2s
+		sudo apt-get update
+		clear
+        
+        
+        if ! sudo apt-get install -y opera; then
+            clear
+            echo ""
+            echo "  There was a problem installing Opera."
+            echo ""
+            echo "  Hit any key to try again, or \"q\" to quit..."
+            read -n1 a
+            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+                clear
+                exit 0
+            else
+                cb-x-www-browser-pipemenu --install-opera
+                exit 0
+            fi
+        else
+            clear
+            echo ""
+            echo "  Opera has been installed successfully."
+            echo ""
+            echo "  Hit any key to exit..."
+            read -n1 a
+            exit 0
+        fi
+    else
+        exit 0
+    fi
+fi
+# Start pipemenu
+echo "    <openbox_pipe_menu>"
+
+# Chromium
+if [ -x "/usr/bin/chromium-browser" ];then
+    I=$((I+1))
+    cat << _menu_
+	    <item label="Chromium Browser">
+            <action name="Execute">
+				<execute>
+					chromium-browser
+				</execute>
+			</action>
+		</item>
+		<item label="Chromium Browser (Private Mode)">
+            <action name="Execute">
+				<execute>
+					chromium-browser --incognito
+				</execute>
+			</action>
+		</item>
+_menu_
+else
+	cat << _menu_
+	    <item label="Install Chromium Browser">
+            <action name="Execute">
+				<execute>
+					cb-x-www-browser-pipemenu --chromium-browser
+				</execute>
+			</action>
+		</item>
+_menu_
+fi
+
+# Iceweasel
+if [ -x "/usr/bin/iceweasel" ];then
+    I=$((I+1))
+    cat << _menu_
+	    <item label="Iceweasel">
+            <action name="Execute">
+				<execute>
+					iceweasel
+				</execute>
+			</action>
+		</item>
+_menu_
+else
+	cat << _menu_
+	    <item label="Install Iceweasel">
+            <action name="Execute">
+				<execute>
+					cb-x-www-browser-pipemenu --iceweasel
+				</execute>
+			</action>
+		</item>
+_menu_
+fi
+
+# Google Chrome
+if [ -x "/usr/bin/google-chrome" ];then
+    I=$((I+1))
+    cat << _menu_
+	    <item label="Google Chrome">
+            <action name="Execute">
+				<execute>
+					google-chrome
+				</execute>
+			</action>
+		</item>
+		<item label="Google Chrome (Private Mode)">
+            <action name="Execute">
+				<execute>
+					google-chrome --incognito
+				</execute>
+			</action>
+		</item>
+_menu_
+else
+	cat << _menu_
+	    <item label="Install Google Chrome">
+            <action name="Execute">
+				<execute>
+					cb-x-www-browser-pipemenu --google-chrome
+				</execute>
+			</action>
+		</item>
+_menu_
+fi
+
+# Opera
+if [ -x "/usr/bin/opera" ];then
+    I=$((I+1))
+    cat << _menu_
+	    <item label="Opera">
+            <action name="Execute">
+				<execute>
+					opera
+				</execute>
+			</action>
+		</item>
+_menu_
+else
+	cat << _menu_
+	    <item label="Install Opera">
+            <action name="Execute">
+				<execute>
+					cb-x-www-browser-pipemenu --opera
+				</execute>
+			</action>
+		</item>
+_menu_
+fi
+
+# Configure default
+if [ $I -gt 1 ];then
+    cat << _menu_
+	    <separator/>
+	    <item label="Select default browser">
+            <action name="Execute">
+				<execute>
+					terminator --command="sudo update-alternatives --config x-www-browser"
+				</execute>
+			</action>
+		</item>
+_menu_
+fi
+# End pipemenu
+echo "    </openbox_pipe_menu>"
+exit 0

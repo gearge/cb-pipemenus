@@ -1,0 +1,15 @@
+Source: cb-pipemenus
+Section: misc
+Priority: extra
+Maintainer: Philip Newborough <corenominal@corenominal.org>
+Build-Depends: debhelper (>= 5.0.0)
+Standards-Version: 3.9.1
+Homepage: http://crunchbang.org/
+
+Package: cb-pipemenus
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton-git, curl, tar, python, python-paramiko
+Description: various Openbox pipemenus.
+ Contains various Openbox pipemenus for use with
+ CrunchBang Linux.
+ .
