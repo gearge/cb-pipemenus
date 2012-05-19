@@ -1,3 +1,15 @@
+cb-pipemenus (0.05) unstable; urgency=low
+
+  * Modified 'connectiontest' function to use the reliable wget method instead of unreliable ping
+  * Moved 'connectiontest' function to a new file (cb-include.cfg), that can be sourced inside any bash script and
+    used to store common variables and functions
+  * Modified relevant cb-* scripts to reflect this change
+  * Modified 'cb-x-www-browser-pipemenu' script to use vendor supplied URLs as primary sources of APT keys;
+    but implemented fallback to packages.crunchbang.org if primary sources fail.
+    This concerns Opera and Google Chrome options.
+
+ -- Giorgi Tavkelishvili <gtavkelishvili@linuxpg.org> Sat, 19 May 2012 14:03:30 +0400
+
 cb-pipemenus (0.04) unstable; urgency=low
 
   * Add cb-sshconfig-pipemenu

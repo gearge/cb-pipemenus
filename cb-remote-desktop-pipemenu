@@ -4,41 +4,17 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-REPO='ftp.de.debian.org'
+pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
+
+if [[ -f $pathto/cb-include.cfg ]]
+then
+    source "$pathto/cb-include.cfg"
+else
+    echo "  Failed to locate cb-include.cfg"
+    exit 1
+fi
+
 I=0
-function connectiontest () {
-	clear
-	echo "  Checking internet connection..."
-	sleep 2s
-	echo ""
-	IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
-	if [ "$IS" -lt "1" ]; then
-		until [ "$CONT" != "" ]; do
-			echo ""
-			IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
-			if [ "$IS" -lt "1" ]; then
-				clear
-				echo "  Internet connection test failed!"
-				echo ""
-				echo "  This script requires a working internet connection. Please configure"
-				echo "  your internet connection, then hit any key to continue, else hit \"q\""
-				echo "  to quit."
-				read -n1 a
-				if [ "$a" = "q" ]; then
-					clear
-					echo "Script aborted."
-					sleep 3s
-					exit 0
-				fi
-			else
-				CONT="pass"
-			fi
-		done
-	fi
-	clear
-	echo "  Internet connection test passed..."
-	sleep 2s
-}
 
 if [ "$1" = "--viewer" ]; then
     terminator --title="Install VNC Viewer" --command="cb-remote-desktop-pipemenu --install-viewer"

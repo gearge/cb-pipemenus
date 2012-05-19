@@ -4,41 +4,22 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-REPO='dl.google.com'
+pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
+
+if [[ -f $pathto/cb-include.cfg ]]
+then
+    source "$pathto/cb-include.cfg"
+else
+    echo "  Failed to locate cb-include.cfg"
+    exit 1
+fi
+
+google_key_url_1='https://dl-ssl.google.com/linux/linux_signing_key.pub'
+google_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key'
+opera_key_url_1='http://deb.opera.com/archive.key'
+opera_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key'
 I=0
-function connectiontest () {
-	clear
-	echo "  Checking internet connection..."
-	sleep 2s
-	echo ""
-	IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
-	if [ "$IS" -lt "1" ]; then
-		until [ "$CONT" != "" ]; do
-			echo ""
-			IS=`/bin/ping -c 1 $REPO | grep -c "64 bytes"`
-			if [ "$IS" -lt "1" ]; then
-				clear
-				echo "  Internet connection test failed!"
-				echo ""
-				echo "  This script requires a working internet connection. Please configure"
-				echo "  your internet connection, then hit any key to continue, else hit \"q\""
-				echo "  to quit."
-				read -n1 a
-				if [ "$a" = "q" ]; then
-					clear
-					echo "Script aborted."
-					sleep 3s
-					exit 0
-				fi
-			else
-				CONT="pass"
-			fi
-		done
-	fi
-	clear
-	echo "  Internet connection test passed..."
-	sleep 2s
-}
+
 if [ "$1" = "--chromium-browser" ]; then
     terminator --title="Install Chromium Browser" --command="cb-x-www-browser-pipemenu --install-chromium-browser"
     exit 0
@@ -173,9 +154,18 @@ if [ "$1" = "--install-google-chrome" ]; then
         clear
         echo "  Adding APT key..."
         sleep 2s
-        wget http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key
-        sudo apt-key add google-chrome.key
-        rm -f google-chrome.key
+        if ! wget -O google.key ${google_key_url_1} 2> /dev/null
+        then
+            # Fallback to packages.crunchbang.org.
+            if ! wget -O google.key ${google_key_url_2} 2> /dev/null
+            then
+                echo "  Failed to retrieve APT key from Google Inc."
+                clear
+                exit 1
+            fi
+        fi
+        sudo apt-key add google.key
+        rm -f google.key
         
         #create sources file
         echo "  Creating APT sources file..."
@@ -238,7 +228,16 @@ if [ "$1" = "--install-opera" ]; then
         clear
         echo "  Adding APT key..."
         sleep 2s
-        wget http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key
+        if ! wget -O opera.key ${opera_key_url_1} 2> /dev/null
+        then
+            # Fallback to packages.crunchbang.org.
+            if ! wget -O opera.key ${opera_key_url_2} 2> /dev/null
+            then
+                echo "  Failed to retrieve APT key from Opera Software ASA."
+                clear
+                exit 1
+            fi
+        fi
         sudo apt-key add opera.key
         rm -f opera.key
         
